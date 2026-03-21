@@ -1,0 +1,71 @@
+# =========================
+# Node Modules (both folders)
+# =========================
+backend/node_modules/
+frontend/node_modules/
+
+# =========================
+# Build folders
+# =========================
+backend/dist/
+backend/build/
+frontend/dist/
+frontend/build/
+.next/
+out/
+
+# =========================
+# Environment files
+# =========================
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+
+# =========================
+# Logs
+# =========================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Cache / Temp
+# =========================
+.cache/
+.tmp/
+.temp/
+
+# =========================
+# Misc
+# =========================
+coverage/
+*.tgz
+
+# =========================
+# Database files
+# =========================
+*.sqlite
+*.db
+
+# =========================
+# Optional: ignore uploads
+# =========================
+backend/uploads/

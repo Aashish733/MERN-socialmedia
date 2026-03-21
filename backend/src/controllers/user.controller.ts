@@ -6,8 +6,8 @@ import {
 } from "../utils/cloudinary.js";
 // import { ApiResponse } from "../utils/ApiResponse.js";
 // import { User } from "../models/user.model.js";
-// import jwt from "jsonwebtoken";
-// import { AccessTokenPayload } from "../types/index.js";
+import jwt from "jsonwebtoken";
+import { AccessTokenPayload } from "../types/index.js";
 // import fs from "fs";
 // import { upload } from "../middlewares/multer.middleware.js";
 import mongoose from "mongoose";
@@ -261,227 +261,227 @@ export const logoutUser = async (req: Request, res: Response) => {
   }
 };
 
-// export const getCurrentUser = async (req: Request, res: Response) => {
-//   try {
-//     const user = req.user;
-//     return res
-//       .status(200)
-//       .json(new ApiResponse(200, user, "current user fetched successfully"));
-//   } catch (error: unknown) {
-//     console.error("Error: ", error);
+export const getCurrentUser = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    return res
+      .status(200)
+      .json(new ApiResponse(200, user, "current user fetched successfully"));
+  } catch (error: unknown) {
+    console.error("Error: ", error);
 
-//     if (error instanceof ApiError) {
-//       return res.status(error.statusCode).json({
-//         success: false,
-//         message: error.message,
-//         errors: error.errors,
-//       });
-//     }
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+        errors: error.errors,
+      });
+    }
 
-//     return res.status(500).json({
-//       success: false,
-//       message: "Internal Server Error",
-//       errors: [],
-//     });
-//   }
-// };
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      errors: [],
+    });
+  }
+};
 
-// export const refreshAccessToken = async (req: Request, res: Response) => {
-//   try {
-//     const incomingRefreshTOken =
-//       req.cookies?.refreshToken ||
-//       req.header("Authorization")?.replace("Bearer ", "");
+export const refreshAccessToken = async (req: Request, res: Response) => {
+  try {
+    const incomingRefreshToken =
+      req.cookies?.refreshToken ||
+      req.header("Authorization")?.replace("Bearer ", "");
 
-//     if (!incomingRefreshTOken) {
-//       throw new ApiError(401, "unauthorized request");
-//     }
+    if (!incomingRefreshToken) {
+      throw new ApiError(401, "unauthorized request");
+    }
 
-//     const decodedToken = jwt.verify(
-//       incomingRefreshTOken,
-//       process.env.REFRESH_TOKEN_SECRET!
-//     ) as AccessTokenPayload;
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET!
+    ) as AccessTokenPayload;
 
-//     const userId = decodedToken?._id;
+    const userId = decodedToken?._id;
 
-//     const user = await User.findById(userId);
+    const user = await User.findById(userId);
 
-//     if (!user) {
-//       throw new ApiError(401, "invalid refresh token");
-//     }
+    if (!user) {
+      throw new ApiError(401, "invalid refresh token");
+    }
 
-//     if (incomingRefreshTOken !== user?.refreshToken) {
-//       throw new ApiError(401, "refresh token invalid or expired");
-//     }
+    if (incomingRefreshToken !== user?.refreshToken) {
+      throw new ApiError(401, "refresh token invalid or expired");
+    }
 
-//     const newRefreshToken = user.generateRefreshToken();
-//     const newAccessToken = user.generateAccessToken();
+    const newRefreshToken = user.generateRefreshToken();
+    const newAccessToken = user.generateAccessToken();
 
-//     user.refreshToken = newRefreshToken;
-//     await user.save({ validateBeforeSave: false });
+    user.refreshToken = newRefreshToken;
+    await user.save({ validateBeforeSave: false });
 
-//     const cookieOptions = {
-//       httpOnly: true,
-//       secure: false,
-//     };
+    const cookieOptions = {
+      httpOnly: true,
+      secure: false,
+    };
 
-//     return res
-//       .status(201)
-//       .cookie("refreshToken", newRefreshToken, cookieOptions)
-//       .cookie("accessToken", newAccessToken, cookieOptions)
-//       .json(
-//         new ApiResponse(
-//           201,
-//           {
-//             refreshToken: newRefreshToken,
-//             accessToken: newAccessToken,
-//           },
-//           "refresh token successfully created"
-//         )
-//       );
-//   } catch (error: unknown) {
-//     console.error("Error: ", error);
+    return res
+      .status(201)
+      .cookie("refreshToken", newRefreshToken, cookieOptions)
+      .cookie("accessToken", newAccessToken, cookieOptions)
+      .json(
+        new ApiResponse(
+          201,
+          {
+            refreshToken: newRefreshToken,
+            accessToken: newAccessToken,
+          },
+          "refresh token successfully created"
+        )
+      );
+  } catch (error: unknown) {
+    console.error("Error: ", error);
 
-//     if (error instanceof ApiError) {
-//       return res.status(error.statusCode).json({
-//         success: false,
-//         message: error.message,
-//         errors: error.errors,
-//       });
-//     }
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+        errors: error.errors,
+      });
+    }
 
-//     return res.status(500).json({
-//       success: false,
-//       message: "Internal Server Error",
-//       errors: [],
-//     });
-//   }
-// };
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      errors: [],
+    });
+  }
+};
 
-// export const changeCurrentPassword = async (req: Request, res: Response) => {
-//   try {
-//     const { oldPassword, newPassword, confirmNewPassword } = req.body;
+export const changeCurrentPassword = async (req: Request, res: Response) => {
+  try {
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
 
-//     if (newPassword !== confirmNewPassword) {
-//       throw new ApiError(
-//         400,
-//         "new password and confirm new password do not match"
-//       );
-//     }
+    if (newPassword !== confirmNewPassword) {
+      throw new ApiError(
+        400,
+        "new password and confirm new password do not match"
+      );
+    }
 
-//     const userId = req.user?._id;
-//     const user = await User.findById(userId);
+    const userId = req.user?._id;
+    const user = await User.findById(userId);
 
-//     if (!user) {
-//       throw new ApiError(401, "unauthorized request");
-//     }
+    if (!user) {
+      throw new ApiError(401, "unauthorized request");
+    }
 
-//     const isOldPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+    const isOldPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
-//     if (!isOldPasswordCorrect) {
-//       throw new ApiError(401, "Your old password is not correct");
-//     }
+    if (!isOldPasswordCorrect) {
+      throw new ApiError(401, "Your old password is not correct");
+    }
 
-//     user.password = newPassword;
-//     await user.save({ validateBeforeSave: false });
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false });
 
-//     return res
-//       .status(200)
-//       .json(new ApiResponse(200, null, "password successfully changed"));
-//   } catch (error: unknown) {
-//     console.error("Error: ", error);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "password successfully changed"));
+  } catch (error: unknown) {
+    console.error("Error: ", error);
 
-//     if (error instanceof ApiError) {
-//       return res.status(error.statusCode).json({
-//         success: false,
-//         message: error.message,
-//         errors: error.errors,
-//       });
-//     }
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+        errors: error.errors,
+      });
+    }
 
-//     return res.status(500).json({
-//       success: false,
-//       message: "Internal Server Error",
-//       errors: [],
-//     });
-//   }
-// };
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      errors: [],
+    });
+  }
+};
 
-// export const addBio = async (req: Request, res: Response) => {
-//   try {
-//     const { bio } = req.body;
+export const addBio = async (req: Request, res: Response) => {
+  try {
+    const { bio } = req.body;
 
-//     if (!bio || bio === "") {
-//       throw new ApiError(400, "bio cannot be empty");
-//     }
+    if (!bio || bio === "") {
+      throw new ApiError(400, "bio cannot be empty");
+    }
 
-//     const userId = req.user?._id;
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       throw new ApiError(401, "user not found");
-//     }
-//     user.bio = bio.trim();
-//     await user.save({ validateBeforeSave: false });
+    const userId = req.user?._id;
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(401, "user not found");
+    }
+    user.bio = bio.trim();
+    await user.save({ validateBeforeSave: false });
 
-//     return res
-//       .status(201)
-//       .json(new ApiResponse(201, null, "bio added successfully"));
-//   } catch (error: unknown) {
-//     console.error("Error: ", error);
+    return res
+      .status(201)
+      .json(new ApiResponse(201, null, "bio added successfully"));
+  } catch (error: unknown) {
+    console.error("Error: ", error);
 
-//     if (error instanceof ApiError) {
-//       return res.status(error.statusCode).json({
-//         success: false,
-//         message: error.message,
-//         errors: error.errors,
-//       });
-//     }
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+        errors: error.errors,
+      });
+    }
 
-//     return res.status(500).json({
-//       success: false,
-//       message: "Internal Server Error",
-//       errors: [],
-//     });
-//   }
-// };
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      errors: [],
+    });
+  }
+};
 
-// export const updateBio = async (req: Request, res: Response) => {
-//   try {
-//     const { updatedBio } = req.body;
-//     if (!updatedBio || updatedBio === "") {
-//       throw new ApiError(400, "updated bio cannot be empty");
-//     }
-//     const userId = req.user?._id;
-//     await User.findByIdAndUpdate(
-//       userId,
-//       {
-//         $set: { bio: updatedBio },
-//       },
-//       {
-//         new: true,
-//       }
-//     );
+export const updateBio = async (req: Request, res: Response) => {
+  try {
+    const { updatedBio } = req.body;
+    if (!updatedBio || updatedBio === "") {
+      throw new ApiError(400, "updated bio cannot be empty");
+    }
+    const userId = req.user?._id;
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: { bio: updatedBio },
+      },
+      {
+        new: true,
+      }
+    );
 
-//     return res
-//       .status(200)
-//       .json(new ApiResponse(200, null, "bio updated successfull"));
-//   } catch (error: unknown) {
-//     console.error("Error: ", error);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "bio updated successfull"));
+  } catch (error: unknown) {
+    console.error("Error: ", error);
 
-//     if (error instanceof ApiError) {
-//       return res.status(error.statusCode).json({
-//         success: false,
-//         message: error.message,
-//         errors: error.errors,
-//       });
-//     }
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+        errors: error.errors,
+      });
+    }
 
-//     return res.status(500).json({
-//       success: false,
-//       message: "Internal Server Error",
-//       errors: [],
-//     });
-//   }
-// };
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      errors: [],
+    });
+  }
+};
 
 // export const updateProfileImage = async (req: Request, res: Response) => {
 //   try {

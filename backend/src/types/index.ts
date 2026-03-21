@@ -1,0 +1,77 @@
+import mongoose, { Document, Model, Schema } from "mongoose";
+import { JwtPayload } from "jsonwebtoken";
+
+export interface IUser {
+  username: string;
+  email: string;
+  password: string;
+  bio?: string;
+  profileImage?: string;
+  posts: mongoose.Types.ObjectId;
+  followers: mongoose.Types.ObjectId[];
+  following: mongoose.Types.ObjectId[];
+  refreshToken?: String | undefined;
+}
+
+export interface IUserMethods {
+  isPasswordCorrect(password: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
+}
+
+export interface IUserDocument extends IUser, Document, IUserMethods {}
+
+export interface AccessTokenPayload extends JwtPayload {
+  _id: string;
+  user: string;
+  email: string;
+}
+
+export interface IMedia {
+  url: string;
+  public_id: string;
+}
+
+export interface IPost {
+  content: string;
+  image?: IMedia;
+  video?: IMedia;
+  owner: mongoose.Types.ObjectId;
+  comments: mongoose.Types.ObjectId[];
+  likes: mongoose.Types.ObjectId[];
+}
+
+export interface IPostDocument extends IPost, Document {}
+
+export interface IComment {
+  post: mongoose.Types.ObjectId;
+  comment: String;
+  commentedBy: mongoose.Types.ObjectId;
+}
+
+export interface ICommentDocument extends IComment, Document {}
+
+export interface ILike {
+  post: mongoose.Types.ObjectId;
+  likedBy: mongoose.Types.ObjectId[];
+}
+
+export interface ILikeDocument extends ILike, Document {}
+
+export interface IConversation {
+  participants: mongoose.Types.ObjectId[];
+  lastMessage?: mongoose.Types.ObjectId;
+}
+
+export interface IConversationDocument extends IConversation, Document {}
+
+export interface IMessage {
+  conversation: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
+  text?: string;
+  image?: string;
+  seenBy: mongoose.Types.ObjectId[];
+  createdAt: Date;
+}
+
+export interface IMessageDocument extends IMessage, Document {}

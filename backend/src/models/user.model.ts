@@ -1,9 +1,14 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions, Secret } from "jsonwebtoken";
+import { IUserDocument, IUserMethods } from "../types/index.js";
 
 
-const userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema<
+  IUserDocument,
+  Model<IUserDocument>,
+  IUserMethods
+>(
   {
     username: {
       type: String,
@@ -55,7 +60,7 @@ const userSchema = new mongoose.Schema(
 );
 
 
-  userSchema.pre("save", async function () {
+  userSchema.pre<IUserDocument>("save", async function () {
     if (!this.isModified("password")) {
       return;
     }
@@ -101,4 +106,4 @@ const userSchema = new mongoose.Schema(
 
 
 
-export const User = mongoose.model("User", userSchema)
+export const User = mongoose.model<IUserDocument>("User", userSchema);

@@ -2,8 +2,8 @@ import express from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import {
   registerUser,
-  // loginUser,
-  // logoutUser,
+  loginUser,
+  logoutUser,
   // refreshAccessToken,
   // getCurrentUser,
   // changeCurrentPassword,
@@ -16,7 +16,7 @@ import {
   // getUserFollowers,
   // searchUser,
 } from "../controllers/user.controller.js";
-// import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 // import { rateLimiter } from "../middlewares/rateLimitter.middleware.js";
 
 const router = express.Router();
@@ -34,11 +34,11 @@ const router = express.Router();
 // });
 
 router.route("/register").post(upload.single("profileImage"), registerUser);
-// router.route("/login").post(loginLimiter, loginUser);
+router.route("/login").post( loginUser);
 // router.route("/refresh-token").post(refreshLimiter, refreshAccessToken);
 
 // // secured routes
-// router.route("/logout").get(verifyJWT, logoutUser);
+router.route("/logout").get(verifyJWT, logoutUser);
 // router.route("/current-user").get(verifyJWT, getCurrentUser);
 // router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 // router.route("/add-bio").post(verifyJWT, addBio);

@@ -11,8 +11,8 @@ import {
   updateBio,
   updateProfileImage,
   getUserProfileData,
-  // followUser,
-  // unfollowUser,
+  followUser,
+  unfollowUser,
   // getUserFollowers,
   // searchUser,
 } from "../controllers/user.controller.js";
@@ -49,8 +49,8 @@ router
 router
   .route("/get-user-profile-data/:username")
   .get(verifyJWT, getUserProfileData);
-// router.route("/follow/:username").post(verifyJWT, followUser);
-// router.route("/unfollow/:username").post(verifyJWT, unfollowUser);
+router.route("/follow/:username").post(verifyJWT, followUser);
+router.route("/unfollow/:username").post(verifyJWT, unfollowUser);
 // router.route("/get-followers").get(verifyJWT, getUserFollowers);
 // router.route("/search").get(verifyJWT, searchUser);
 

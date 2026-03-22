@@ -38,13 +38,15 @@ export const uploadVideoToCloudinary = async (localFilePath: string) => {
 };
 
 export const removeFromCloudinary = async (
-  publicId: string,
-  resourceType: "image" | "video"
+  imageUrl: string
 ) => {
   try {
-    await cloudinary.uploader.destroy(publicId, {
-      resource_type: resourceType,
-    });
+    const urlArray  = imageUrl.split('/')
+    const imageNameWithExt = urlArray[urlArray.length - 1]
+    const imageNameArray = imageNameWithExt.split('.')
+    const imageName = imageNameArray[0]
+
+    await cloudinary.uploader.destroy(imageName);
   } catch (error) {
     console.log("Cloudinary Delete Error:", error);
   }

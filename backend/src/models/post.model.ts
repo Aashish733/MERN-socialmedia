@@ -3,23 +3,32 @@ import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
-   content: {
+    content: {
       type: String,
       required: true,
     },
     image: {
-      required: false,
-    },
-    video: {
-      required: false,
+      type: String,
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
- 
+
   {
     timestamps: true,
   }

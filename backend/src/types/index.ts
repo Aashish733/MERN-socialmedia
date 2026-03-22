@@ -7,7 +7,7 @@ export interface IUser {
   password: string;
   bio?: string;
   profileImage?: string;
-  posts: mongoose.Types.ObjectId;
+  posts: mongoose.Types.ObjectId[];
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
   refreshToken?: String | undefined;
@@ -32,16 +32,16 @@ export interface AccessTokenPayload extends JwtPayload {
 //   public_id: string;
 // }
 
-// export interface IPost {
-//   content: string;
-//   image?: IMedia;
-//   video?: IMedia;
-//   owner: mongoose.Types.ObjectId;
-//   comments: mongoose.Types.ObjectId[];
-//   likes: mongoose.Types.ObjectId[];
-// }
+export interface IPost {
+  content: string;
+  image?: string;
+  video?: string;
+  owner: mongoose.Types.ObjectId;
+  comments: mongoose.Types.ObjectId[];
+  likes: mongoose.Types.ObjectId[];
+}
 
-// export interface IPostDocument extends IPost, Document {}
+export interface IPostDocument extends IPost, Document {}
 
 // export interface IComment {
 //   post: mongoose.Types.ObjectId;

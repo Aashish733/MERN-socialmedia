@@ -9,7 +9,7 @@ import {
   changeCurrentPassword,
   addBio,
   updateBio,
-  // updateProfileImage,
+  updateProfileImage,
   // getUserProfileData,
   // followUser,
   // unfollowUser,
@@ -43,9 +43,9 @@ router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 router.route("/add-bio").post(verifyJWT, addBio);
 router.route("/update-bio").patch(verifyJWT, updateBio);
-// router
-//   .route("/update-profile-image")
-//   .patch(verifyJWT, upload.single("profileImage"), updateProfileImage);
+router
+  .route("/update-profile-image")
+  .patch(verifyJWT, upload.single("profileImage"), updateProfileImage);
 // router
 //   .route("/get-user-profile-data/:username")
 //   .get(verifyJWT, getUserProfileData);

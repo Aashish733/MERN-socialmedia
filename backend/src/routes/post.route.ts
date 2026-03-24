@@ -6,7 +6,7 @@ import {
   getAllPostsForHome,
   getUserPosts,
   // getUserPostById,
-  // updatePostContent,
+  updatePostContent,
   // deletePost,
   // getPostById,
   // searchPosts,
@@ -25,9 +25,9 @@ router.route("/user-posts/:username").get(verifyJWT, getUserPosts);
 // router.route("/:postId").get(verifyJWT, getPostById);
 // router.route("/search/post").get(verifyJWT, searchPosts);
 // router.route("/user/:postId").get(verifyJWT, getUserPostById);
-// router
-//   .route("/update-post-content/:postId")
-//   .patch(verifyJWT, updatePostContent);
+router
+  .route("/update-post-content/:postId")
+  .patch(verifyJWT, updatePostContent);
 // router.route("/delete-post/:postId").delete(verifyJWT, deletePost);
 
 export default router;

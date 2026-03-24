@@ -43,13 +43,13 @@ export interface IPost {
 
 export interface IPostDocument extends IPost, Document {}
 
-// export interface IComment {
-//   post: mongoose.Types.ObjectId;
-//   comment: String;
-//   commentedBy: mongoose.Types.ObjectId;
-// }
+export interface IComment {
+  post: mongoose.Types.ObjectId;
+  comment: String;
+  commentedBy: mongoose.Types.ObjectId;
+}
 
-// export interface ICommentDocument extends IComment, Document {}
+export interface ICommentDocument extends IComment, Document {}
 
 // export interface ILike {
 //   post: mongoose.Types.ObjectId;

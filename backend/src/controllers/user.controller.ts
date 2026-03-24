@@ -617,6 +617,8 @@ export const getUserProfileData = async (req: Request, res: Response) => {
 
 // // create controller to follow and unfollow
 export const followUser = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     const { username } = req.params;
     const loggedInUserId = req.user?._id;
@@ -673,6 +675,9 @@ export const followUser = async (req: Request, res: Response) => {
         )
       );
   } catch (error: unknown) {
+    await session.abortTransaction()
+    session.endSession();
+    
     console.error("Error: ", error);
 
     if (error instanceof ApiError) {

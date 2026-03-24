@@ -51,12 +51,12 @@ export interface IComment {
 
 export interface ICommentDocument extends IComment, Document {}
 
-// export interface ILike {
-//   post: mongoose.Types.ObjectId;
-//   likedBy: mongoose.Types.ObjectId[];
-// }
+export interface ILike {
+  post: mongoose.Types.ObjectId;
+  likedBy: mongoose.Types.ObjectId[];
+}
 
-// export interface ILikeDocument extends ILike, Document {}
+export interface ILikeDocument extends ILike, Document {}
 
 // export interface IConversation {
 //   participants: mongoose.Types.ObjectId[];

@@ -6,11 +6,15 @@ import { useState } from 'react';
 import { loginUser } from '../../api/auth.api';
 import Spinner from '../General/Spinner';
 import { toast } from 'sonner';
+import { useDispatch } from "react-redux";
+import { setUser } from '../../store/slices/authSlice';
 
 const LoginUserForm = () => {
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
    const {
      register,
      handleSubmit,
@@ -21,21 +25,24 @@ const LoginUserForm = () => {
    });
 
    const onSubmit  = async(data: LoginUserFormData)=>{
-    console.log(data)
+    // console.log(data)
      try {
        setLoading(true);
        setServerError(null);
 
        const response = await loginUser(data);
-      //  dispatch(setUser(response.data.user));
+        dispatch(setUser(response.data.user));
        toast.success(`Welcome Back ${response.data.user.username}`);
        reset();
        navigate("/");
-     } catch (error: any) {
-       setServerError(error.message);
-       toast.error(error.message);
-     } finally {
-       setLoading(false);
+     } catch (error: unknown) {
+       if (error instanceof Error) {
+         setServerError(error.message);
+         toast.error(error.message);
+       } else {
+         setServerError("Something went wrong");
+         toast.error("Something went wrong");
+       }
      }
    }
 

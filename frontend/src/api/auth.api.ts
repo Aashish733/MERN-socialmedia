@@ -28,7 +28,7 @@ export const registerUser = async (data: RegisterUserFormData) => {
 
 export const loginUser = async (data: LoginUserFormData) => {
   const formData = new FormData();
-  console.log(backendUrl);
+  // console.log(backendUrl);
 
   // console.log(data);
   // console.log(typeof data.identifier);

@@ -1,20 +1,81 @@
-import React from 'react'
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginUserSchema, type LoginUserFormData } from '../../schemas/auth.schema';
+import { useState } from 'react';
+import { loginUser } from '../../api/auth.api';
+import Spinner from '../General/Spinner';
+import { toast } from 'sonner';
 
 const LoginUserForm = () => {
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+   const {
+     register,
+     handleSubmit,
+     reset,
+     formState: { errors },
+   } = useForm<LoginUserFormData>({
+     resolver: zodResolver(loginUserSchema),
+   });
+
+   const onSubmit  = async(data: LoginUserFormData)=>{
+    console.log(data)
+     try {
+       setLoading(true);
+       setServerError(null);
+
+       const response = await loginUser(data);
+      //  dispatch(setUser(response.data.user));
+       toast.success(`Welcome Back ${response.data.user.username}`);
+       reset();
+       navigate("/");
+     } catch (error: any) {
+       setServerError(error.message);
+       toast.error(error.message);
+     } finally {
+       setLoading(false);
+     }
+   }
+
+   const inputBase =
+     "w-full bg-[#15151c] border text-gray-100 px-2 py-2 rounded-xl outline-none transition-all duration-200 placeholder:text-gray-500";
+
+   const inputFocus =
+     "focus:border-[#9929EA] focus:ring-2 focus:ring-[#9929EA]/30";
+
+   const inputError = "border-red-500 focus:ring-red-500/20";
+
   return (
-    <form action="">
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label htmlFor="">Username</label>
-        <input type="text" placeholder="create your username" />
-      </div>
-      <div>
-        <label htmlFor="">Email</label>
-        <input type="email" placeholder="enter your email" />
+        <label htmlFor="">User or Email</label>
+        <input
+          type="text"
+          placeholder="enter your email or username"
+          {...register("identifier")}
+          className={`${inputBase} ${inputFocus} ${
+            errors.identifier ? inputError : "border-[#2a2a35]"
+          }`}
+        />
+        <p className="text-red-500 text-xs mt-1 min-h-[16px]">
+          {errors.identifier?.message}
+        </p>
       </div>
       <div>
         <label htmlFor="">Password</label>
-        <input type="password" placeholder="Enter your password" />
+        <input
+          type="password"
+          placeholder="Enter your password"
+          {...register("password")}
+          className={`${inputBase} ${inputFocus} ${
+            errors.password ? inputError : "border-[#2a2a35]"
+          }`}
+        />
+        <p className="text-red-500 text-xs mt-1 min-h-[16px]">
+          {errors.password?.message}
+        </p>
       </div>
       <div>
         Don't have an acccount?{" "}
@@ -22,7 +83,24 @@ const LoginUserForm = () => {
           <Link to={"/register"}>Register here</Link>
         </span>
       </div>
-      <button>Login</button>
+      <button
+        type="submit"
+        disabled={loading}
+        className="
+          w-full bg-[#9929EA]
+          hover:bg-[#7b14c4]
+          text-white font-semibold
+          py-3 rounded-xl
+          transition-all duration-200
+          active:scale-[0.98]
+          disabled:opacity-60
+          disabled:cursor-not-allowed
+          flex items-center justify-center
+          cursor-pointer
+        "
+      >
+        {loading ? <Spinner /> : "Login"}
+      </button>
     </form>
   );
 }

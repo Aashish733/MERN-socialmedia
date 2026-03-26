@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ApiError } from "../utils/ApiError.js";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import { AccessTokenPayload } from "../types/index.js";
 

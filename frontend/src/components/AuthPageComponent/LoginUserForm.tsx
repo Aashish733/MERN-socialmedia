@@ -8,6 +8,7 @@ import Spinner from '../General/Spinner';
 import { toast } from 'sonner';
 import { useDispatch } from "react-redux";
 import { setUser } from '../../store/slices/authSlice';
+import axios from 'axios';
 
 const LoginUserForm = () => {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -24,27 +25,24 @@ const LoginUserForm = () => {
      resolver: zodResolver(loginUserSchema),
    });
 
-   const onSubmit  = async(data: LoginUserFormData)=>{
-    // console.log(data)
+   const onSubmit = async (data: LoginUserFormData) => {
+     // console.log(data);
      try {
        setLoading(true);
        setServerError(null);
 
        const response = await loginUser(data);
-        dispatch(setUser(response.data.user));
+       dispatch(setUser(response.data.user));
        toast.success(`Welcome Back ${response.data.user.username}`);
        reset();
        navigate("/");
-     } catch (error: unknown) {
-       if (error instanceof Error) {
-         setServerError(error.message);
-         toast.error(error.message);
-       } else {
-         setServerError("Something went wrong");
-         toast.error("Something went wrong");
-       }
+     } catch (error: any) {
+       setServerError(error.message);
+       toast.error(error.message);
+     } finally {
+       setLoading(false);
      }
-   }
+   };
 
    const inputBase =
      "w-full bg-[#15151c] border text-gray-100 px-2 py-2 rounded-xl outline-none transition-all duration-200 placeholder:text-gray-500";

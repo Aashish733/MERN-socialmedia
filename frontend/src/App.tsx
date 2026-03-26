@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react'
-import { Route, Routes } from 'react-router'
-import RegisterPage from './pages/RegisterPage'
-import LoginPage from './pages/LoginPage'
-import Home from './pages/Home'
-import DotCanvas from './components/DotCanvas'
-import type { RootState } from './store/store'
-import { useDispatch, useSelector } from 'react-redux'
-import { getCurrentUser } from './api/auth.api'
-import { setAuthLoad, setUser } from './store/slices/authSlice'
+import React, { useEffect } from "react";
+import { Route, Routes } from "react-router";
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
+import Feedpage from "./pages/FeedPage";
+import DotCanvas from "./components/DotCanvas";
+import type { RootState } from "./store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentUser } from "./api/auth.api";
+import { setAuthLoad, setUser } from "./store/slices/authSlice";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
 
 const App = () => {
-
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
 
@@ -20,8 +21,7 @@ const App = () => {
         const response = await getCurrentUser();
         dispatch(setUser(response.data));
       } catch (error: unknown) {
-        if (error instanceof Error) 
-        console.log(error.message);
+        if (error instanceof Error) console.log(error.message);
       } finally {
         dispatch(setAuthLoad());
       }
@@ -30,19 +30,29 @@ const App = () => {
     loadUser();
   }, [dispatch]);
   return (
-    
-      
-  <div>
+    <div>
       <Routes>
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Feedpage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Home />} />
       </Routes>
     </div>
-    
-   
-
   );
-}
+};
 
-export default App
+export default App;

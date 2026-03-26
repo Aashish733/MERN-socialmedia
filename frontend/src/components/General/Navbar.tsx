@@ -52,7 +52,7 @@
 //   return (
 //     <nav className="h-[60px] flex justify-between items-center px-4 md:px-20 border-b border-[#230737]">
 //       <Link to="/" className="text-[#9929EA] font-bold text-xl md:text-3xl">
-//         ConnectHub
+//         Flexgram
 //       </Link>
 
 //       {/* Search */}
@@ -194,7 +194,7 @@ const Navbar = () => {
       {/* ================= NAVBAR ================= */}
       <nav className="h-[60px] flex justify-between items-center px-4 md:px-20 border-b border-[#230737]">
         <Link to="/" className="text-[#9929EA] font-bold text-xl md:text-3xl">
-          ConnectHub
+          Flexgram
         </Link>
 
         {/* -------- Desktop Search -------- */}

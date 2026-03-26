@@ -5,7 +5,7 @@ const LoginPage = () => {
   //     <div className="h-screen flex flex-col gap-5 md:gap-10 items-center">
   //       <div className="flex flex-col items-center gap-2 md:gap-5 pt-12">
   //         <h1 className="text-2xl md:text-5xl text-[#9929EA] font-bold">
-  //           Welcome To ConnectHub
+  //           Welcome To Flexgram
   //         </h1>
   //         <p className="text-white md:text-2xl">A Place To Flex Your Creation</p>
   //       </div>
@@ -26,7 +26,7 @@ const LoginPage = () => {
         {/* Heading */}
         <div className="text-center mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-[#9929EA]">
-            Welcome back to ConnectHub
+            Welcome back to Flexgram
           </h1>
 
           <p className="text-gray-400 mt-1 text-sm">

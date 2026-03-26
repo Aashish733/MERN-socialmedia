@@ -9,9 +9,10 @@ import { replace, useNavigate } from 'react-router'
 import Navbar from '../components/General/Navbar'
 import Sidebar from '../components/General/Sidebar'
 import ChatBar from '../components/General/ChatBar'
-import FeedSection from '../components/FeedPageComponents/FeedSection'
+
 import { getFeedPosts } from '../api/feed.api'
 import type { FeedPostType } from '../types/feed'
+import FeedPost from '../components/FeedPageComponents/FeedPost'
 
 const Feedpage = () => {
    const [feedPosts, setFeedPosts] =useState<FeedPostType[]>([])
@@ -55,13 +56,15 @@ const Feedpage = () => {
       <Navbar />
       <div className="container flex">
         <Sidebar />
+        <div className='feed-container bg-white-500'>
         {loadingPosts ? (
           <Spinner />
         ) : (
           feedPosts.length !== 0 &&
           feedPosts.map((feedPost) => 
-          <FeedSection key={feedPost._id} post={feedPost} />)
+          <FeedPost key={feedPost._id} post={feedPost} />)
         )}
+        </div>
         <ChatBar />
       </div>
     </div>

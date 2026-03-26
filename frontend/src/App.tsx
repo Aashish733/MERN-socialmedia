@@ -10,6 +10,7 @@ import { getCurrentUser } from "./api/auth.api";
 import { setAuthLoad, setUser } from "./store/slices/authSlice";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
+import ProfilePage from "./pages/ProfilePage";
 
 const App = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -40,6 +41,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile/:username"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/register"
@@ -49,6 +58,7 @@ const App = () => {
             </PublicRoute>
           }
         />
+
         <Route path="/login" element={<LoginPage />} />
       </Routes>
     </div>

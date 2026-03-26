@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type { CommentType } from "../../types/comment";
 import { Heart, MessageCircle, User2 } from "lucide-react";
 import { toggleLikePost } from "../../api/like.api";
+import { Link } from "react-router";
 
 interface FeedPostProps {
   post: FeedPostType;
@@ -72,13 +73,23 @@ const FeedPost = ({ post }: FeedPostProps) => {
       <section>
         <div>
           <div>
-            {user?.profileImage ? (
-              <img src={post.owner.profileImage} alt={post.owner.username} />
-            ) : (
-              <User2 />
-            )}
+            <Link
+              to={`/profile/${post.owner.username}`}
+              className="flex items-center gap-2"
+            >
+              {user?.profileImage ? (
+                <img src={post.owner.profileImage} alt={post.owner.username} />
+              ) : (
+                <User2 />
+              )}
+            </Link>
+            <Link
+              to={`/profile/${post.owner.username}`}
+              className="flex items-center gap-2"
+            >
+              <span>{post.owner.username}</span>
+            </Link>
 
-            <span>{post.owner.username}</span>
             <span>{new Date(post.createdAt).toLocaleString()}</span>
           </div>
 

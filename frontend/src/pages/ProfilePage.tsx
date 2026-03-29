@@ -7,9 +7,9 @@ import UserProfileContainer from '../components/ProfilePageComponents/UserProfil
 
 const ProfilePage = () => {
   return (
-    <div className="h-screen overflow-hidden flex flex-col">
+    <div className="h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 ">
         <Sidebar/>
         <UserProfileContainer/>
         <ChatBar />

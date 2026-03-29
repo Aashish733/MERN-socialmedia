@@ -1,21 +1,21 @@
-import type { UserPostType } from "../../types/userPost";
-import UserPost from "./UserPost";
+import React from 'react'
+import type { UserPostType } from '../../types/userPost'
+import UserPost from './UserPost';
 interface Props {
-  userPosts: UserPostType[];
-  onDeletePost: (postId: string) => void;
+  userPosts: UserPostType[]
 }
 
-const UserPosts = ({ userPosts, onDeletePost }: Props) => {
+const UserPosts = ({userPosts}: Props) => {
   if (!userPosts.length) {
     return <div className="text-zinc-400 text-center my-4">No Posts Yet.</div>;
   }
   return (
-    <div className="flex flex-col gap-4">
+    <div className="max-w-225 mx-auto w-full flex flex-col gap-4">
       {userPosts.map((post) => (
-        <UserPost key={post._id} post={post} onDeletePost={onDeletePost} />
+        <UserPost key={post._id} post={post}  />
       ))}
     </div>
   );
-};
+}
 
-export default UserPosts;
+export default UserPosts

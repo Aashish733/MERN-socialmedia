@@ -93,10 +93,15 @@ export const createComment = async (
     //   console.log("Emitted comment notification to:", ownerId);
     // }
 
+    const populatedComment = await createdComment.populate(
+      "commentedBy",
+      "username profileImage"
+    );
+
     return res
       .status(201)
       .json(
-        new ApiResponse(201, createComment, "comment created successfully")
+        new ApiResponse(201, populatedComment, "comment created successfully")
       );
   } catch (error: any) {
     console.error("Error: ", error);

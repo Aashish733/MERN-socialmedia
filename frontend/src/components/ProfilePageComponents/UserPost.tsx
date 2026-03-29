@@ -29,10 +29,10 @@ const UserPost = ({post}: Props) => {
 
       if (isLikedByMe) {
         setLikes((prev) => prev.filter((id) => id !== user._id));
-        // setLikeCount((prev) => prev - 1);
+        setLikeCount((prev) => prev - 1);
       } else {
         setLikes((prev) => [...prev, user._id]);
-        // setLikeCount((prev) => prev + 1);
+        setLikeCount((prev) => prev + 1);
       }
 
       await toggleLikePost(post._id);

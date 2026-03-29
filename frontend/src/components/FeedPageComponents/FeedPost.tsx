@@ -4,9 +4,11 @@ import type { RootState } from "../../store/store";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import type { CommentType } from "../../types/comment";
-import { Heart, MessageCircle, User2 } from "lucide-react";
+import { Heart, MessageCircle, Trash2, User2 } from "lucide-react";
 import { toggleLikePost } from "../../api/like.api";
 import { Link } from "react-router";
+import { createComment, deleteComment, getCommentsByPostId } from "../../api/comment.api";
+import Spinner from "../General/Spinner";
 
 interface FeedPostProps {
   post: FeedPostType;
@@ -18,13 +20,13 @@ const FeedPost = ({ post }: FeedPostProps) => {
   const [likes, setLikes] = useState<string[]>(post.likes);
   const [likeCount, setLikeCount] = useState<number>(post.likeCount);
   const [loading, setLoading] = useState(false);
-  // const [showComments, setShowComments] = useState<boolean>(false);
-  // const [comments, setComments] = useState<CommentType[]>([]);
-  // const [commentText, setCommentText] = useState("");
-  // const [loadingComments, setLoadingComments] = useState(false);
-  // const [commentsCount, setCommentsCount] = useState<number>(
-  //   post.commentsCount,
-  // );
+  const [showComments, setShowComments] = useState<boolean>(false);
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [commentsCount, setCommentsCount] = useState<number>(
+    post.commentsCount,
+  );
   // const [expanded, setExpanded] = useState<boolean>(false);
   // const contentRef = useRef<HTMLDivElement | null>(null);
   // const [isOverflowing, setIsOverflowing] = useState<boolean>(false);
@@ -66,6 +68,48 @@ const FeedPost = ({ post }: FeedPostProps) => {
     }
   }
 
+  const fetchComments = async () => {
+    try {
+      setLoadingComments(true);
+      const data = await getCommentsByPostId(post._id);
+      setComments(data);
+    } catch {
+      toast.error("Failed to load comments");
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+   const handleToggleComments = () => {
+     setShowComments((prev) => !prev);
+     if (!showComments) fetchComments();
+   };
+
+    const handleAddComment = async () => {
+      if (!user) return toast.error("Login to comment");
+      if (!commentText.trim()) return toast.error("Comment cannot be empty");
+
+      try {
+        const newComment = await createComment(post._id, commentText);
+        setComments((prev) => [newComment, ...prev]);
+        setCommentsCount((prev) => prev + 1);
+        setCommentText("");
+        toast.success("Comment added");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to add comment");
+      }
+    };
+
+   const handleDeleteComment = async (commentId: string) => {
+     try {
+       await deleteComment(post._id, commentId);
+       setComments((prev) => prev.filter((c) => c._id !== commentId));
+       setCommentsCount((prev) => prev - 1);
+       toast.success("Comment deleted");
+     } catch (error: any) {
+       toast.error(error.message || "Failed to delete comment");
+     }
+   };
 
  
   return (
@@ -109,13 +153,82 @@ const FeedPost = ({ post }: FeedPostProps) => {
               ({likeCount})
             </button>
             <button
-              // onClick={handleToggleComments}
+              onClick={handleToggleComments}
               className="flex items-center gap-1 text-black/80 hover:text-black cursor-pointer"
             >
               <MessageCircle size={20} />
-              <span className="text-sm">{post.commentsCount}</span>
+              <span className="text-sm">{commentsCount}</span>
             </button>
           </div>
+
+          {/* Comments */}
+          {showComments && (
+            <div className="mt-4 space-y-3 border-t border-white/10 pt-4">
+              {loadingComments ? (
+                <Spinner />
+              ) : comments.length === 0 ? (
+                <p className="text-white/60 text-sm">No comments yet</p>
+              ) : (
+                comments.map((comment) => {
+                  const isPostOwner = user?._id === post.owner._id;
+                  const isCommentOwner = user?._id === comment.commentedBy._id;
+                  const canDelete = isPostOwner || isCommentOwner;
+
+                  return (
+                    <div
+                      key={comment._id}
+                      className="flex items-start gap-2 justify-between"
+                    >
+                      <div className="flex gap-2">
+                        <img
+                          src={
+                            comment.commentedBy.profileImage || "/avatar1.jpg"
+                          }
+                          className="w-8 h-8 rounded-full object-cover"
+                          alt={comment.commentedBy.username}
+                        />
+                        <div>
+                          <p className="text-sm text-black font-bold">
+                            {comment.commentedBy.username}
+                          </p>
+                          <p className="text-sm text-black/80">
+                            {comment.comment}
+                          </p>
+                        </div>
+                      </div>
+
+                      {canDelete && (
+                        <button
+                          onClick={() => handleDeleteComment(comment._id)}
+                          className="text-red-400 hover:text-red-500 cursor-pointer"
+                          title="Delete comment"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+
+              {/* Add comment */}
+              {/* <div className="flex gap-2 pt-2"> */}
+              <div className="flex gap-2 pt-2 flex-wrap sm:flex-nowrap">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="flex-1 bg-white/5 text-white px-3 py-2 rounded-md"
+                  placeholder="Write a comment"
+                />
+                <button
+                  onClick={handleAddComment}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold transition disabled:opacity-50 cursor-pointer hover:scale-[1.02] bg-[#9929EA] text-white"
+                >
+                  Post
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>

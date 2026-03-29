@@ -39,6 +39,7 @@ const UserInfo = ({ user, refetchProfile }: UserInfoProps) => {
     setBioInput(user.bio || "");
   }, [user.bio]);
 
+  
   const handleSaveBio = async () => {
     if (!bioInput.trim()) {
       toast.error("Bio cannot be empty");
@@ -133,6 +134,7 @@ const UserInfo = ({ user, refetchProfile }: UserInfoProps) => {
             <div className="w-full h-full rounded-full overflow-hidden bg-black">
               {user.profileImage ? (
                 <img
+                
                   src={user.profileImage}
                   alt={user.username}
                   className="w-full h-full object-cover"

@@ -34,7 +34,7 @@ const Feedpage = () => {
         setLoadingPosts(true); 
         const posts = await getFeedPosts();
        
-        console.log("API POSTS:", posts);
+        // console.log("API POSTS:", posts);
         setFeedPosts(posts);
       } catch (error: any) {
           setServerError(error.message)

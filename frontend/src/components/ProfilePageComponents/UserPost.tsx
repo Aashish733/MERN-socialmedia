@@ -1,24 +1,40 @@
-import React, { useState } from 'react'
-import type { UserPostType } from '../../types/userPost'
-import { Link } from 'react-router';
-import { Heart, MessageCircle, User2, } from 'lucide-react';
-import { toast } from 'sonner';
-import type { RootState } from '../../store/store';
-import { useSelector } from 'react-redux';
-import { toggleLikePost } from '../../api/like.api';
+import React, { useRef, useState } from "react";
+import type { UserPostType } from "../../types/userPost";
+import { Link } from "react-router";
+import { Heart, MessageCircle, Trash2, User2 } from "lucide-react";
+import { toast } from "sonner";
+import type { RootState } from "../../store/store";
+import { useSelector } from "react-redux";
+import { toggleLikePost } from "../../api/like.api";
+import {
+  createComment,
+  deleteComment,
+  getCommentsByPostId,
+} from "../../api/comment.api";
+import Spinner from "../General/Spinner";
 
-interface Props{
-  post: UserPostType
+interface Props {
+  post: UserPostType;
 }
-const UserPost = ({post}: Props) => {
-    const user = useSelector((state: RootState) => state.auth.user);
-   const [likes, setLikes] = useState<string[]>(post.likes);
+const UserPost = ({ post }: Props) => {
+  const user = useSelector((state: RootState) => state.auth.user);
+  const [likes, setLikes] = useState<string[]>(post.likes);
   const [loading, setLoading] = useState(false);
-   const isLikedByMe = user ? likes.includes(user._id) : false;
-    const [likeCount, setLikeCount] = useState<number>(post.likeCount);
+  // const isLikedByMe = user ? likes.includes(user._id) : false;
+  const [likeCount, setLikeCount] = useState<number>(post.likeCount);
+  const [showComments, setShowComments] = useState<boolean>(false);
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [commentsCount, setCommentsCount] = useState<number>(post.commentCount);
+  const [commentText, setCommentText] = useState("");
+  const [loadingComments, setLoadingComments] = useState<boolean>(false);
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [isOverflowing, setIsOverflowing] = useState<boolean>(false);
+  const isLikedByMe = user ? likes.includes(user._id) : false;
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-
-   const handleToggleLike = async () => {
+  const handleToggleLike = async () => {
     if (!user) {
       toast.error("Please login to like the post");
       return;
@@ -42,6 +58,50 @@ const UserPost = ({post}: Props) => {
       setLoading(false);
     }
   };
+
+  const fetchComments = async () => {
+    try {
+      setLoadingComments(true);
+      const data = await getCommentsByPostId(post._id);
+      setComments(data);
+    } catch {
+      toast.error("Failed to load comments");
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const handleToggleComments = () => {
+    setShowComments((prev) => !prev);
+    if (!showComments) fetchComments();
+  };
+
+  const handleAddComment = async () => {
+    if (!user) return toast.error("Login to comment");
+    if (!commentText.trim()) return toast.error("Comment cannot be empty");
+
+    try {
+      const newComment = await createComment(post._id, commentText);
+      setComments((prev) => [newComment, ...prev]);
+      setCommentsCount((prev) => prev + 1);
+      setCommentText("");
+      toast.success("Comment added");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to add comment");
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment(post._id, commentId);
+      setComments((prev) => prev.filter((c) => c._id !== commentId));
+      setCommentsCount((prev) => prev - 1);
+      toast.success("Comment deleted");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete comment");
+    }
+  };
+
   return (
     <section>
       <div>
@@ -73,25 +133,93 @@ const UserPost = ({post}: Props) => {
           <p>{post.content}</p>
 
           <div>
-                      <button onClick={handleToggleLike} disabled={loading}>
-                        <Heart
-                          size={20}
-                          className={`transition ${isLikedByMe ? "fill-red-500" : "fill-none"}`}
+            <button onClick={handleToggleLike} disabled={loading}>
+              <Heart
+                size={20}
+                className={`transition ${isLikedByMe ? "fill-red-500" : "fill-none"}`}
+              />
+              ({likeCount})
+            </button>
+            <button
+              onClick={handleToggleComments}
+              className="flex items-center gap-1 text-black/80 hover:text-black cursor-pointer"
+            >
+              <MessageCircle size={20} />
+              <span className="text-sm">{commentsCount}</span>
+            </button>
+          </div>
+          {/* Comments */}
+          {showComments && (
+            <div className="mt-4 space-y-3 border-t border-white/10 pt-4">
+              {loadingComments ? (
+                <Spinner />
+              ) : comments.length === 0 ? (
+                <p className="text-black/60 text-sm">No comments yet</p>
+              ) : (
+                comments.map((comment) => {
+                  const isPostOwner = user?._id === post.owner._id;
+                  const isCommentOwner = user?._id === comment.commentedBy._id;
+                  const canDelete = isPostOwner || isCommentOwner;
+
+                  return (
+                    <div
+                      key={comment._id}
+                      className="flex items-start gap-2 justify-between"
+                    >
+                      <div className="flex gap-2">
+                        <img
+                          src={
+                            comment.commentedBy.profileImage ||
+                            "/default-avatar.png"
+                          }
+                          className="w-8 h-8 rounded-full object-cover"
+                          alt={comment.commentedBy.username}
                         />
-                        ({likeCount})
-                      </button>
-                      <button
-                        // onClick={handleToggleComments}
-                        className="flex items-center gap-1 text-black/80 hover:text-black cursor-pointer"
-                      >
-                        <MessageCircle  size={20} />
-                        <span className="text-sm">{post.commentCount}</span>
-                      </button>
+                        <div>
+                          <p className="text-sm text-black font-bold">
+                            {comment.commentedBy.username}
+                          </p>
+                          <p className="text-sm text-black/80">
+                            {comment.comment}
+                          </p>
+                        </div>
+                      </div>
+
+                      {canDelete && (
+                        <button
+                          onClick={() => handleDeleteComment(comment._id)}
+                          className="text-red-400 hover:text-red-500 cursor-pointer"
+                          title="Delete comment"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
                     </div>
+                  );
+                })
+              )}
+
+              {/* Add comment */}
+              <div className="flex gap-2 pt-2">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="flex-1 bg-white/5 text-white px-3 py-2 rounded-md"
+                  placeholder="Write a comment"
+                />
+                <button
+                  onClick={handleAddComment}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold transition disabled:opacity-50 cursor-pointer hover:scale-[1.02] bg-[#9929EA] text-white"
+                >
+                  Post
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
-}
+};
 
-export default UserPost
+export default UserPost;

@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import type { FeedPostType } from "../../types/feed";
 import type { RootState } from "../../store/store";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { CommentType } from "../../types/comment";
 import { Heart, MessageCircle, Trash2, User2 } from "lucide-react";
@@ -27,9 +27,9 @@ const FeedPost = ({ post }: FeedPostProps) => {
   const [commentsCount, setCommentsCount] = useState<number>(
     post.commentsCount,
   );
-  // const [expanded, setExpanded] = useState<boolean>(false);
-  // const contentRef = useRef<HTMLDivElement | null>(null);
-  // const [isOverflowing, setIsOverflowing] = useState<boolean>(false);
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [isOverflowing, setIsOverflowing] = useState<boolean>(false);
 
   const isLikedByMe = user ? likes.includes(user._id) : false;
 
@@ -111,6 +111,13 @@ const FeedPost = ({ post }: FeedPostProps) => {
      }
    };
 
+    useEffect(() => {
+      if (contentRef.current) {
+        const element = contentRef.current;
+        setIsOverflowing(element.scrollHeight > element.clientHeight);
+      }
+    }, [post.content]);
+
  
   return (
     <div>
@@ -142,7 +149,26 @@ const FeedPost = ({ post }: FeedPostProps) => {
               <img src={post.image} alt="Post image" />
             </div>
           )}
-          <p>{post.content}</p>
+
+          {/* Post content with read more */}
+          <div  className="relative">
+            <div
+              ref={contentRef}
+              className={`prose prose-invert max-w-none text-black transition-all duration-300 ${
+                expanded ? "" : "line-clamp-3 overflow-hidden"
+              }`}
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+            {isOverflowing && (
+              <button
+                onClick={() => setExpanded((prev) => !prev)}
+                className="mt-1 text-sm text-black/60 cursor-pointer hover:underline"
+              >
+                {expanded ? "Show less" : "More"}
+              </button>
+            )}
+          </div>
+          {/* <div dangerouslySetInnerHTML={{ __html: post.content }}></div> */}
 
           <div>
             <button onClick={handleToggleLike} disabled={loading}>

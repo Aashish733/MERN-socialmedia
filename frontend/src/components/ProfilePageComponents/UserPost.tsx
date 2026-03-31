@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { UserPostType } from "../../types/userPost";
 import { Link } from "react-router";
 import { Heart, MessageCircle, Trash2, User2 } from "lucide-react";
@@ -102,6 +102,13 @@ const UserPost = ({ post }: Props) => {
     }
   };
 
+   useEffect(() => {
+     if (contentRef.current) {
+       const element = contentRef.current;
+       setIsOverflowing(element.scrollHeight > element.clientHeight);
+     }
+   }, [post.content]);
+
   return (
     <section>
       <div>
@@ -130,7 +137,24 @@ const UserPost = ({ post }: Props) => {
               <img src={post.image} alt="Post image" />
             </div>
           )}
-          <p>{post.content}</p>
+          {/* Post content with read more */}
+          <div className="relative">
+            <div
+              ref={contentRef}
+              className={`prose prose-invert max-w-none text-black transition-all duration-300 ${
+                expanded ? "" : "line-clamp-3 overflow-hidden"
+              }`}
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+            {isOverflowing && (
+              <button
+                onClick={() => setExpanded((prev) => !prev)}
+                className="mt-1 text-sm text-black/60 cursor-pointer hover:underline"
+              >
+                {expanded ? "Show less" : "More"}
+              </button>
+            )}
+          </div>
 
           <div>
             <button onClick={handleToggleLike} disabled={loading}>

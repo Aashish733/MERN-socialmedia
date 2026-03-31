@@ -6,7 +6,7 @@ interface Props {
 }
 
 const UserPosts = ({userPosts}: Props) => {
-  if (!userPosts.length) {
+    if (!userPosts.length) {
     return <div className="text-zinc-400 text-center my-4">No Posts Yet.</div>;
   }
   return (

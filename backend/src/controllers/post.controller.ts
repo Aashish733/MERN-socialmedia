@@ -8,7 +8,7 @@ import {
 import { User } from "../models/user.model.js";
 import { Post } from "../models/post.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-// import sanitizeHtml from "sanitize-html";
+import sanitizeHtml from "sanitize-html";
 import mongoose from "mongoose";
 // import { io } from "../index.js";
 // import { redisClient } from "../config/redis.js";
@@ -134,29 +134,44 @@ export const createPost = async (req: Request, res: Response) => {
     let imageLocalPath;
     let image;
     let post;
-    if(req.file?.path){
-      imageLocalPath = req.file.path
+    if (req.file?.path) {
+      imageLocalPath = req.file.path;
       image = await uploadToCloudinary(imageLocalPath);
     }
 
-    const {content} =req.body;
+    const { content } = req.body;
     const userId = req.user?._id;
 
-    const user = await User.findById(userId)
-    if(!user){
-      throw new ApiError(404, "user not found")
+    // Sanitize HTML from TipTap
+    const cleanContent = sanitizeHtml(content, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+      allowedAttributes: {
+        a: ["href", "target", "rel"],
+        img: ["src", "alt"],
+        span: ["style"],
+      },
+      allowedStyles: {
+        "*": {
+          "font-size": [/^\d+(px|em|rem)$/],
+        },
+      },
+    });
+
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "user not found");
     }
 
     if (image === undefined) {
       post = await Post.create({
-        content,
-        owner: userId
+        content: cleanContent,
+        owner: userId,
       });
     } else {
       post = await Post.create({
-        content,
+        content: cleanContent,
         image: image.url,
-        owner: userId
+        owner: userId,
       });
     }
 

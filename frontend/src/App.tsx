@@ -11,6 +11,7 @@ import { setAuthLoad, setUser } from "./store/slices/authSlice";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import ProfilePage from "./pages/ProfilePage";
+import UploadPostPage from "./pages/UploadPostPage";
 
 const App = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -46,6 +47,15 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/upload-post"
+          element={
+            <ProtectedRoute>
+              <UploadPostPage />
             </ProtectedRoute>
           }
         />

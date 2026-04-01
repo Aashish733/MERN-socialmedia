@@ -5,10 +5,10 @@ import {
   createPost,
   getAllPostsForHome,
   getUserPosts,
-  // getUserPostById,
+  getUserPostById,
   updatePostContent,
-  // deletePost,
-  // getPostById,
+  deletePost,
+  getPostById,
   // searchPosts,
 } from "../controllers/post.controller.js";
 
@@ -22,12 +22,12 @@ router.route("/create-post").post(
 
 router.route("/all-posts").get(verifyJWT, getAllPostsForHome);
 router.route("/user-posts/:username").get(verifyJWT, getUserPosts);
-// router.route("/:postId").get(verifyJWT, getPostById);
+router.route("/:postId").get(verifyJWT, getPostById);
 // router.route("/search/post").get(verifyJWT, searchPosts);
-// router.route("/user/:postId").get(verifyJWT, getUserPostById);
+router.route("/user/:postId").get(verifyJWT, getUserPostById);
 router
   .route("/update-post-content/:postId")
   .patch(verifyJWT, updatePostContent);
-// router.route("/delete-post/:postId").delete(verifyJWT, deletePost);
+router.route("/delete-post/:postId").delete(verifyJWT, deletePost);
 
 export default router;

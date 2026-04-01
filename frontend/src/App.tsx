@@ -12,6 +12,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import ProfilePage from "./pages/ProfilePage";
 import UploadPostPage from "./pages/UploadPostPage";
+import EditPostPage from "./pages/EditPostPage";
 
 const App = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -50,7 +51,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/upload-post"
           element={
@@ -59,7 +59,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="profile/:username/post/edit/:postId"
+          element={
+            <ProtectedRoute>
+              <EditPostPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/register"
           element={
@@ -68,7 +75,6 @@ const App = () => {
             </PublicRoute>
           }
         />
-
         <Route path="/login" element={<LoginPage />} />
       </Routes>
     </div>

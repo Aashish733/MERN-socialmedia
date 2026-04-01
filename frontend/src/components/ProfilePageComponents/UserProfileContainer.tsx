@@ -82,6 +82,11 @@ const UserProfileContainer = () => {
     getUserPosts();
   }, [username]);
 
+  const handleDeletePostFromUI = (postId: string) => {
+    setUserPosts((prev) => prev.filter((post) => post._id !== postId));
+    refetchProfile();
+  };
+
   if (loading) return <Spinner />;
   if (!userProfileInfo) return <div>User not found</div>;
 
@@ -104,7 +109,7 @@ const UserProfileContainer = () => {
       ) : (
         <UserPosts
           userPosts={userPosts}
-          // onDeletePost={handleDeletePostFromUI}
+          onDeletePost={handleDeletePostFromUI}
         />
       )}
     </div>

@@ -10,8 +10,8 @@ import { Post } from "../models/post.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import sanitizeHtml from "sanitize-html";
 import mongoose from "mongoose";
-// import { io } from "../index.js";
-// import { redisClient } from "../config/redis.js";
+import { io } from "../index.js";
+import { redisClient } from "../config/redis.js";
 
 export const createPost = async (req: Request, res: Response) => {
   try {
@@ -110,26 +110,26 @@ export const createPost = async (req: Request, res: Response) => {
     // //   });
     // // }
 
-    // const populatedPost = await Post.findById(createdPost._id)
-    //   .populate("owner", "username profileImage")
-    //   .lean();
+    const populatedPost = await Post.findById(createdPost._id)
+      .populate("owner", "username profileImage")
+      .lean();
 
-    // if (!populatedPost) {
-    //   throw new ApiError(500, "failed to populate post");
-    // }
+    if (!populatedPost) {
+      throw new ApiError(500, "failed to populate post");
+    }
 
-    // const formattedPost = {
-    //   ...populatedPost,
-    //   likes: [],
-    //   likeCount: 0,
-    //   commentsCount: 0,
-    //   comments: [],
-    // };
+    const formattedPost = {
+      ...populatedPost,
+      likes: [],
+      likeCount: 0,
+      commentsCount: 0,
+      comments: [],
+    };
 
-    // io.emit("new_post", formattedPost);
+    io.emit("new_post", formattedPost);
 
-    // await redisClient.del("home:posts");
-    // await redisClient.del(`user:posts:${user.username}`);
+    await redisClient.del("home:posts");
+    await redisClient.del(`user:posts:${user.username}`);
 
     let imageLocalPath;
     let image;
@@ -201,21 +201,21 @@ export const getAllPostsForHome = async (req: Request, res: Response) => {
   try {
    
 
-    // const cacheKey = "home:posts";
+    const cacheKey = "home:posts";
 
-    // const cachedData = await redisClient.get(cacheKey);
+    const cachedData = await redisClient.get(cacheKey);
 
-    // if (cachedData) {
-    //   return res
-    //     .status(200)
-    //     .json(
-    //       new ApiResponse(
-    //         200,
-    //         JSON.parse(cachedData),
-    //         "posts fetched from cache"
-    //       )
-    //     );
-    // }
+    if (cachedData) {
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            JSON.parse(cachedData),
+            "posts fetched from cache"
+          )
+        );
+    }
 
 
 //aggregate pipeline is Filter joined data
@@ -312,25 +312,25 @@ export const getAllPostsForHome = async (req: Request, res: Response) => {
           },
         },
 
-      //   {
-      //     $project: {
-      //       commentUsers: 0,
-      //       __v: 0,
-      //       // keep likes if frontend needs it
-      //       // remove this line if you want full likes array
-      //       // likes: 1
-      //     },
-      //   },
-      //   {
-      //     $sort: { createdAt: -1 },
-      //   },
+        {
+          $project: {
+            commentUsers: 0,
+            __v: 0,
+            // keep likes if frontend needs it
+            // remove this line if you want full likes array
+            // likes: 1
+          },
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
     ]);
 
     // console.log(posts);
 
-    // await redisClient.set(cacheKey, JSON.stringify(posts), {
-    //   EX: 60,
-    // });
+    await redisClient.set(cacheKey, JSON.stringify(posts), {
+      EX: 60,
+    });
 
     return res
       .status(200)
@@ -362,21 +362,21 @@ export const getUserPosts = async (req: Request, res: Response) => {
       throw new ApiError(404, "username not found");
     }
 
-    // const cacheKey = `user:posts:${username}`;
+    const cacheKey = `user:posts:${username}`;
 
-    // const cachedData = await redisClient.get(cacheKey);
+    const cachedData = await redisClient.get(cacheKey);
 
-    // if (cachedData) {
-    //   return res
-    //     .status(200)
-    //     .json(
-    //       new ApiResponse(
-    //         200,
-    //         JSON.parse(cachedData),
-    //         "user posts fetched from cache"
-    //       )
-    //     );
-    // }
+    if (cachedData) {
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            JSON.parse(cachedData),
+            "user posts fetched from cache"
+          )
+        );
+    }
 
     const posts = await Post.aggregate([
       //Join owner
@@ -494,9 +494,9 @@ export const getUserPosts = async (req: Request, res: Response) => {
       { $sort: { createdAt: -1 } },
     ]);
 
-    // await redisClient.set(cacheKey, JSON.stringify(posts), {
-    //   EX: 60,
-    // });
+    await redisClient.set(cacheKey, JSON.stringify(posts), {
+      EX: 60,
+    });
 
     return res
       .status(200)
@@ -686,8 +686,8 @@ export const updatePostContent = async (req: Request, res: Response) => {
     post.content = content;
     post.save({ validateBeforeSave: false });
 
-    // await redisClient.del("home:posts");
-    // await redisClient.del(`user:posts:${req.user?.username}`);
+    await redisClient.del("home:posts");
+    await redisClient.del(`user:posts:${req.user?.username}`);
 
     return res
       .status(200)

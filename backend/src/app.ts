@@ -6,6 +6,7 @@ import userRoute from "./routes/user.route.js";
 import postRoute from "./routes/post.route.js";
 import commentRoute from "./routes/comment.route.js";
 import likeRoute from "./routes/like.route.js";
+import chatRoute from "./routes/chat.route.js";
 
 const app = express();
 app.use(express.json());
@@ -24,8 +25,7 @@ app.use("/api/v1/users", userRoute);
 app.use("/api/v1/posts", postRoute)
 app.use("/api/v1/comments", commentRoute);
 app.use("/api/v1/likes", likeRoute);
-
-
+app.use("/api/v1/chats", chatRoute);
 
 
 export default app;

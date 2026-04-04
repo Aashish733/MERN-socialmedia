@@ -13,8 +13,8 @@ import {
   getUserProfileData,
   followUser,
   unfollowUser,
-  // getUserFollowers,
-  // searchUser,
+  getUserFollowers,
+  searchUser,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 // import { rateLimiter } from "../middlewares/rateLimitter.middleware.js";
@@ -51,7 +51,7 @@ router
   .get(verifyJWT, getUserProfileData);
 router.route("/follow/:username").post(verifyJWT, followUser);
 router.route("/unfollow/:username").post(verifyJWT, unfollowUser);
-// router.route("/get-followers").get(verifyJWT, getUserFollowers);
-// router.route("/search").get(verifyJWT, searchUser);
+router.route("/get-followers").get(verifyJWT, getUserFollowers);
+router.route("/search").get(verifyJWT, searchUser);
 
 export default router;

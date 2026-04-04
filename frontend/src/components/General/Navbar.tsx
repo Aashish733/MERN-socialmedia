@@ -139,14 +139,14 @@ import type { RootState } from "../../store/store";
 import { Search, User2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-// import { searchPosts } from "../../api/post.api";
-// import type { SearchPost } from "../../types/searchPost";
+import { searchPosts } from "../../api/post.api";
+import type { SearchPost } from "../../types/searchPost";
 
 const Navbar = () => {
   const user = useSelector((state: RootState) => state.auth.user);
 
   const [query, setQuery] = useState("");
-  // const [results, setResults] = useState<SearchPost[]>([]);
+  const [results, setResults] = useState<SearchPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -164,8 +164,8 @@ const Navbar = () => {
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
-        // const response = await searchPosts(query);
-        // setResults(response);
+        const response = await searchPosts(query);
+        setResults(response);
         setOpen(true);
       } catch (error) {
         console.error("Search error", error);

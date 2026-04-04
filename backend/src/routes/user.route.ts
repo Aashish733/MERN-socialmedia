@@ -17,25 +17,25 @@ import {
   searchUser,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-// import { rateLimiter } from "../middlewares/rateLimitter.middleware.js";
+import { rateLimiter } from "../middlewares/rateLimitter.middleware.js";
 
 const router = express.Router();
 
-// const loginLimiter = rateLimiter({
-//   windowMs: 15 * 60 * 1000,
-//   max: 5,
-//   prefix: "login",
-// });
+const loginLimiter = rateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  prefix: "login",
+});
 
-// const refreshLimiter = rateLimiter({
-//   windowMs: 15 * 60 * 1000,
-//   max: 10,
-//   prefix: "refresh",
-// });
+const refreshLimiter = rateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  prefix: "refresh",
+});
 
 router.route("/register").post(upload.single("profileImage"), registerUser);
-router.route("/login").post( loginUser);
-router.route("/refresh-token").post( refreshAccessToken);
+router.route("/login").post(loginLimiter, loginUser);
+router.route("/refresh-token").post(refreshLimiter, refreshAccessToken);
 
 // // secured routes
 router.route("/logout").get(verifyJWT, logoutUser);
